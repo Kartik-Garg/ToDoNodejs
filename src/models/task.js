@@ -6,6 +6,11 @@ const taskSchema = mongoose.Schema({
     completed:{
         type: Boolean
     },
+    visibility:{
+        type:String,
+        enum:["public", "private"],
+        default:"private"
+    },
     owner:{
         type: mongoose.Schema.Types.ObjectId,
         required: true,
