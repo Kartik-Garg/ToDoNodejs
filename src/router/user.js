@@ -58,4 +58,35 @@ router.post('/users/logout' , auth, async(req,res) => {
 })
 //hiding info - .toJSON in model classes
 
+//updating user password
+router.patch('/users/:id', auth, async(req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if(!isValidOperation){
+        return res.status(400).send({ error : 'Invalid Update!'})
+    }
+    try{
+        //new returns the updated user back instead of old, after the updates
+        //findByIdAndUpdate bypasses the mongoose, so we comment it out
+        //const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+        const user = await User.findById(req.params.id)
+        //iterating over updates array
+        updates.forEach((update) => {
+            //we use [] to access a property dynamically
+            user[update] = req.body[update] 
+        })
+
+        await user.save()
+        
+        if(!user){
+            return res.status(404).send()
+        }
+        res.send(user)
+    }
+    catch(e){
+        res.status(400).send(e)
+    }
+})
 module.exports = router
